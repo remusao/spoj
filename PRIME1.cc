@@ -444,8 +444,6 @@ void solution(unsigned m, unsigned n, MemInter* output)
     output->m = m;
     output->n = n;
 
-    //std::cout << "sol : " << m << " : " << n << std::endl;
-
     // Used by the sieve
     unsigned i, p, start;
     std::vector<bool> res(n - m + 1, true);
@@ -466,7 +464,6 @@ void solution(unsigned m, unsigned n, MemInter* output)
                 start += p;
         }
 
-        //std::cout << "prime : " << p << " m : " << m << " start : " << start << std::endl;
         for (unsigned j = start; j <= n; j += p)
             res[j - m] = false;
     }
@@ -496,24 +493,6 @@ void solution(unsigned m, unsigned n, MemInter* output)
     }
     output->primes[p] = 0;
 }
-
-
-void printMem(MemInter* memo)
-{
-    std::cerr << "Printing memo :" << std::endl;
-    while (memo)
-    {
-        std::cerr << memo->m << " - " << memo->n << std::endl;
-        memo = memo->next;
-    }
-}
-
-void printState(unsigned m, unsigned n, MemInter* memo)
-{
-    std::cerr << '\n' << "New [" << m << " - " << n << "]" << std::endl;
-    printMem(memo);
-}
-
 
 // Insert elt into memo
 MemInter* insert(MemInter* elt, MemInter* memo)
@@ -548,8 +527,6 @@ MemInter* schedule(int m, int n, MemInter* memo)
     MemInter* p = memo->next;
     MemInter* prev = memo;
 
-    //std::cout << memo << " : " << m << " - " << n << std::endl;
-
     // What if n is prime in that case ? (TODO)
     if (m >= n)
     {
@@ -557,15 +534,6 @@ MemInter* schedule(int m, int n, MemInter* memo)
         return memo;
     }
 
-//    std::cout << prev << " " << p << std::endl;
-
-    // Find a bucket
-    /*while (p && n > p->m) //!(m < p->m && n > p->m))
-    {
-        prev = p;
-        p = p->next;
-    }
-*/
     while (p)
     {
         // contained in bucket
@@ -606,13 +574,7 @@ MemInter* schedule(int m, int n, MemInter* memo)
             memo = insert(res, memo);
             return schedule(p->n + 1, n, memo);
         }
- /*       else
-        {
-            std::cerr << "\n\033[31mNot supposed to be here.\033[37m" << std::endl;
-            printState(m, n, p);
-            return memo;
-        }
-*/
+
         p = p->next;
     }
 
@@ -623,64 +585,11 @@ MemInter* schedule(int m, int n, MemInter* memo)
         return insert(res, memo);
     }
     return memo;
-/*
-    if (p) // found a bucket
-    {
-        if (m < p->n) // contained or overlaps
-        {
-            if (n <= p->n) // entirely in the bucket
-                memSolution(m, n, p->primes);
-            else // overlaps
-            {
-                memSolution(m, p->n, p->primes);
-                return schedule(p->n + 1, n, memo); // TODO : just pass p->next
-            }
-        }
-        else if (n < p->m) // whole new bucket
-        {
-            MemInter* res = new MemInter;
-            solution(m, n, res);
-            return insert(res, memo);
-        }
-        else // overlaps with next bucket
-        {
-            p = p->next;
-            if (p)
-            {
-                MemInter* res = new MemInter;
-                solution(m, p->m - 1, res);
-                memo = insert(res, memo);
-                return schedule(p->m, n, memo);
-            }
-            else
-            {
-                MemInter* res = new MemInter;
-                solution(m, n, res);
-                return insert(res, memo);
-            }
-        }
-    }
-    else // not found
-    {
-        MemInter* res = new MemInter;
-        solution(m, n, res);
-        return insert(res, memo);
-    }
-
-    return memo;
-    */
 }
 
 
 int main()
 {
-    // end guard
-    /*MemInter* eguard = new MemInter;
-    eguard->m = 1000000001;
-    eguard->n = 1000000002;
-    eguard->next = 0;
-    eguard->primes = 0;
-*/
     // Actual first memo
     MemInter* memo = new MemInter;
     memo->m = 1;
@@ -688,7 +597,7 @@ int main()
     memo->primes = primes;
     memo->next = 0; //eguard;
 
-    // begin guard
+    // begin guard of the linked list
     MemInter* bguard = new MemInter;
     bguard->m = -2;
     bguard->n = -1;
@@ -697,22 +606,16 @@ int main()
 
     unsigned t, m, n;
 
-    //std::cout << memo << std::endl;
-
     std::cin >> t;
     if (t > 0)
     {
         std::cin >> m >> n;
-        //solution(m, n, memo);
-        //printState(m, n, memo);
         memo = schedule(m, n, bguard);
     }
     while (--t)
     {
         std::cout << '\n';
         std::cin >> m >> n;
-        //solution(m, n, memo);
-        //printState(m, n, memo);
         memo = schedule(m, n, bguard);
     }
     std::cout.flush();
