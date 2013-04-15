@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstring>
 
-#define SIZE 2000000
+#define SIZE 1000000
 #define SHIFT 1000
 
 
@@ -27,35 +27,22 @@ unsigned incr(char number[], unsigned offset)
 unsigned nextPalindrome(char notShifted[], char number[], unsigned shift)
 {
     unsigned len = strlen(number) - 1;
-    unsigned i = 0, overflow = 0;
-
-    // printf("step : (shift == %u, ptr == %p) %s\n", shift, number, number);
+    unsigned i = 0;
 
     // Add one to the number because we want a palindrom
     // bigger than initial number
-    if (shift == SHIFT)
-    {
-       // printf("incr\n");
-        overflow += (incr(notShifted, len + shift) < shift ? 1 : 0);
-        if (overflow)
-            return overflow;
-    }
+    if (shift == SHIFT && incr(notShifted, len + shift) < shift ? 1 : 0)
+        return 1;
 
-    // printf("len : %u\n", len);
     while (i < len)
     {
-         //printf("i : %u\n", i);
-        if (number[len - i] > number[i])
-        {
-            overflow += (incr(notShifted, len - i - 1 + shift) < shift ? 1 : 0);
-            if (overflow)
-                return overflow;
-        }
+        if (number[len - i] > number[i] && incr(notShifted, len - i - 1 + shift) < shift ? 1 : 0)
+            return 1;
         number[len - i] = number[i];
         ++i;
     }
 
-    return overflow;
+    return 0;
 }
 
 int main()
